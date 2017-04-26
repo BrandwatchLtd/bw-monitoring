@@ -95,7 +95,7 @@ const getMiddleware = () => (req, res, next) => {
     return Promise.resolve().then(() => res.send(metrics()));
   }
 
-  return Promise.resolve(next);
+  return next();
 };
 
 const reset = () => {

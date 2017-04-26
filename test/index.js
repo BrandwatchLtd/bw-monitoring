@@ -22,6 +22,13 @@ describe('bw-monitoring', () => {
     mon.reset();
   });
 
+  it('ignores unrequired url paths', () => {
+    req.path = '/your-app';
+    const mid = mon.getMiddleware();
+    mid(req, res, next);
+    assert(next.called, true);
+  });
+
   describe('/healthz endpoint', () => {
     beforeEach(() => {
       req.path = '/healthz';
