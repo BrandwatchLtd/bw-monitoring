@@ -1,14 +1,13 @@
 /**
-  * Configure a ExpressJS middleware to expose useful health/metrics/checks endpoints
-  */
+ * Configure a ExpressJS middleware to expose useful health/metrics/checks endpoints.
+ */
 
-
-// Default configuration for the middleware
+// Default empty configuration
 let metrics;
 let readinessChecks = [];
 let healthChecks = [];
 
-const runHealthCheck = ({ name, check }) =>
+const doCheck = ({ name, check }) =>
   new Promise((resolve) => {
     // Pass in the [ok, warning, critical, unknown] callbacks. i.e. just resolve the promise.
     check(
@@ -19,50 +18,33 @@ const runHealthCheck = ({ name, check }) =>
     );
   });
 
-const runReadinessCheck = ({ check }) =>
+const doReadinessCheck = ({ check }) =>
   // Pass four callbacks so that health checks can be directly re-used for readiness checks
   new Promise((resolve, reject) => check(resolve, reject, reject, reject));
 
 const toPrometheusFormat = (str, { name, value }) => `${str}${name} ${value}\n`;
 
-function addReadinessCheck(check) {
-  readinessChecks.push(check);
-}
-
-function addMetrics(m) {
-  metrics = m;
-}
-
-function addHealthCheck(check) {
-  healthChecks.push(check);
-}
+const addCheck = (check) => healthChecks.push(check);
+const addReadinessCheck = (check) => readinessChecks.push(check);
+const addMetrics = (m) => { metrics = m; };
 
 const getMiddleware = () => (req, res, next) => {
   res.header('Content-Type', 'text/plain; version=0.0.4');
 
-  // The express app is running
   if (req.path === '/healthz') {
     if (readinessChecks.length < 1) {
       return Promise.resolve().then(() => res.sendStatus(200));
     }
 
     const promisedChecks = readinessChecks.map((check) =>
-      new Promise((resolve, reject) => runReadinessCheck(check)
+      new Promise((resolve, reject) => doReadinessCheck(check)
         .then(resolve)
-        .catch(reject)
-      )
+        .catch(reject))
     );
 
     return Promise.all(promisedChecks)
       .then(() => res.sendStatus(200))
       .catch(() => res.sendStatus(500));
-
-
-    // return new Promise((resolve, reject) => {
-    //   readinessProbe(resolve, reject);
-    // })
-    //   .then(() => res.sendStatus(200))
-    //   .catch(() => res.sendStatus(500));
   }
 
   // Run the checks and return in prometheus formats
@@ -72,7 +54,7 @@ const getMiddleware = () => (req, res, next) => {
     }
 
     const promisedChecks = healthChecks.map((check) =>
-      new Promise((resolve, reject) => runHealthCheck(check)
+      new Promise((resolve, reject) => doCheck(check)
         .then(resolve)
         .catch(reject)
       )
@@ -81,8 +63,7 @@ const getMiddleware = () => (req, res, next) => {
     return Promise.all(promisedChecks)
       .then((check) =>
         res.send(
-          check.reduce(toPrometheusFormat, '')
-        )
+          check.reduce(toPrometheusFormat, ''))
       );
   }
 
@@ -105,9 +86,9 @@ const reset = () => {
 };
 
 module.exports = {
-  addHealthCheck,
-  addMetrics,
+  addCheck,
   addReadinessCheck,
+  addMetrics,
   getMiddleware,
   reset,
 };

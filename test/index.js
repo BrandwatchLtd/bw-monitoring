@@ -83,8 +83,8 @@ describe('bw-monitoring', () => {
     });
 
     it('can be configured to do checks that succeed', (done) => {
-      mon.addHealthCheck({ name: 'bob0', check: (ok) => ok() });
-      mon.addHealthCheck({ name: 'bob1', check: (ok) => ok() });
+      mon.addCheck({ name: 'bob0', check: (ok) => ok() });
+      mon.addCheck({ name: 'bob1', check: (ok) => ok() });
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
@@ -94,10 +94,10 @@ describe('bw-monitoring', () => {
     });
 
     it('can be configured to do checks that warn and fail', (done) => {
-      mon.addHealthCheck({ name: 'bob0', check: (ok) => ok() });
-      mon.addHealthCheck({ name: 'bob1', check: (ok, warning) => warning() });
-      mon.addHealthCheck({ name: 'bob2', check: (ok, warning, critical) => critical() });
-      mon.addHealthCheck({ name: 'bob3', check: (ok, warning, critical, unknown) => unknown() });
+      mon.addCheck({ name: 'bob0', check: (ok) => ok() });
+      mon.addCheck({ name: 'bob1', check: (ok, warning) => warning() });
+      mon.addCheck({ name: 'bob2', check: (ok, warning, critical) => critical() });
+      mon.addCheck({ name: 'bob3', check: (ok, warning, critical, unknown) => unknown() });
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
