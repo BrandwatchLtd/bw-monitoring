@@ -7,6 +7,8 @@ let metrics;
 let readinessChecks = [];
 let healthChecks = [];
 
+const prometheusContentType = 'text/plain; version=0.0.4';
+
 const doCheck = ({ name, check }) =>
   new Promise((resolve) => {
     // Pass in the [ok, warning, critical, unknown] callbacks. i.e. just resolve the promise.
@@ -29,9 +31,9 @@ const addReadinessCheck = (check) => readinessChecks.push(check);
 const addMetrics = (m) => { metrics = m; };
 
 const getMiddleware = () => (req, res, next) => {
-  res.header('Content-Type', 'text/plain; version=0.0.4');
-
   if (req.path === '/healthz') {
+    res.set('Content-Type', prometheusContentType);
+
     if (readinessChecks.length < 1) {
       return Promise.resolve().then(() => res.sendStatus(200));
     }
@@ -49,6 +51,8 @@ const getMiddleware = () => (req, res, next) => {
 
   // Run the checks and return in prometheus formats
   else if (req.path === '/checkz') {
+    res.set('Content-Type', prometheusContentType);
+
     if (healthChecks.length < 1) {
       return Promise.resolve().then(() => res.sendStatus(404));
     }
@@ -69,6 +73,8 @@ const getMiddleware = () => (req, res, next) => {
 
   // Send any prometheus metrics specified
   else if (req.path === '/metricz') {
+    res.set('Content-Type', prometheusContentType);
+
     if (!metrics) {
       return Promise.resolve().then(() => res.sendStatus(404));
     }
