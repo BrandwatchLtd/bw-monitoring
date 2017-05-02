@@ -11,7 +11,7 @@ describe('bw-monitoring', () => {
   beforeEach(() => {
     req = {};
     res = {
-      header: () => {},
+      set: sinon.spy(),
       sendStatus: sinon.spy(),
       send: sinon.spy(),
     };
@@ -26,7 +26,7 @@ describe('bw-monitoring', () => {
     req.path = '/your-app';
     const mid = mon.getMiddleware();
     mid(req, res, next);
-    assert(next.called, true);
+    assert(next.called);
   });
 
   describe('/healthz endpoint', () => {
@@ -38,7 +38,7 @@ describe('bw-monitoring', () => {
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
-          assert(res.sendStatus.calledWith(200), true);
+          assert(res.sendStatus.calledWith(200));
           done();
         });
     });
@@ -49,7 +49,7 @@ describe('bw-monitoring', () => {
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
-          assert(res.sendStatus.calledWith(200), true);
+          assert(res.sendStatus.calledWith(200));
           done();
         });
     });
@@ -62,7 +62,7 @@ describe('bw-monitoring', () => {
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
-          assert(res.sendStatus.calledWith(500), true);
+          assert(res.sendStatus.calledWith(500));
           done();
         });
     });
@@ -77,7 +77,7 @@ describe('bw-monitoring', () => {
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
-          assert(res.sendStatus.calledWith(404), true);
+          assert(res.sendStatus.calledWith(404));
           done();
         });
     });
@@ -88,7 +88,7 @@ describe('bw-monitoring', () => {
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
-          assert(res.send.calledWith('bob0 0\nbob1 0\n'), true);
+          assert(res.send.calledWith('bob0 0\nbob1 0\n'));
           done();
         });
     });
@@ -101,7 +101,7 @@ describe('bw-monitoring', () => {
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
-          assert(res.send.calledWith('bob0 0\nbob1 1\nbob2 2\nbob3 3\n'), true);
+          assert(res.send.calledWith('bob0 0\nbob1 1\nbob2 2\nbob3 3\n'));
           done();
         });
     });
@@ -116,7 +116,7 @@ describe('bw-monitoring', () => {
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
-          assert(res.sendStatus.calledWith(404), true);
+          assert(res.sendStatus.calledWith(404));
           done();
         });
     });
@@ -126,9 +126,39 @@ describe('bw-monitoring', () => {
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
-          assert(res.send.calledWith('some string basically'), true);
+          assert(res.send.calledWith('some string basically'));
           done();
         });
+    });
+  });
+
+  describe('Content-Type header', () => {
+    it('is not set if no paths match', () => {
+      req.path = '/nothing-interesting';
+      const mid = mon.getMiddleware();
+      mid(req, res, next);
+      assert.equal(res.set.callCount, 0);
+    });
+
+    it('is set for /metricz', () => {
+      req.path = '/metricz';
+      const mid = mon.getMiddleware();
+      mid(req, res, next);
+      assert.equal(res.set.callCount, 1);
+    });
+
+    it('is set for /checkz', () => {
+      req.path = '/checkz';
+      const mid = mon.getMiddleware();
+      mid(req, res, next);
+      assert.equal(res.set.callCount, 1);
+    });
+
+    it('is set for /healthz', () => {
+      req.path = '/healthz';
+      const mid = mon.getMiddleware();
+      mid(req, res, next);
+      assert.equal(res.set.callCount, 1);
     });
   });
 });
