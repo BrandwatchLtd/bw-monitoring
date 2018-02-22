@@ -6,6 +6,7 @@
 let metrics;
 let readinessChecks = [];
 let healthChecks = [];
+let isShuttingDown = false;
 
 const prometheusContentType = 'text/plain; version=0.0.4';
 
@@ -36,6 +37,10 @@ const getMiddleware = () => (req, res, next) => {
 
     if (readinessChecks.length < 1) {
       return Promise.resolve().then(() => res.sendStatus(200));
+    }
+
+    if (isShuttingDown) {
+      return Promise.resolve().then(() => res.sendStatus(500));
     }
 
     const promisedChecks = readinessChecks.map((check) =>
@@ -85,10 +90,16 @@ const getMiddleware = () => (req, res, next) => {
   return next();
 };
 
+// Listen for requests to kill the process and initiate the safe shutdown.
+process.on('SIGTERM', () => {
+  isShuttingDown = true;
+});
+
 const reset = () => {
   metrics = undefined;
   readinessChecks = [];
   healthChecks = [];
+  isShuttingDown = false;
 };
 
 module.exports = {
