@@ -57,14 +57,33 @@ describe('bw-monitoring', () => {
     it('should return 500 if any check fails', (done) => {
       mon.addReadinessCheck({ name: 'bob', check: (ok) => ok() });
       mon.addReadinessCheck({ name: 'bob2', check: (ok, warning) => warning() });
-      mon.addReadinessCheck({ name: 'bob2', check: (ok, warning, critical) => critical() });
-      mon.addReadinessCheck({ name: 'bob2', check: (ok, warning, critical, unknown) => unknown() });
+      mon.addReadinessCheck({ name: 'bob3', check: (ok, warning, critical) => critical() });
+      mon.addReadinessCheck({ name: 'bob4', check: (ok, warning, critical, unknown) => unknown() });
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
           assert(res.sendStatus.calledWith(500));
           done();
         });
+    });
+
+    it('should return 500 after receiving SIGTERM', (done) => {
+      mon.addReadinessCheck({ name: 'bob', check: (ok) => ok() });
+      const mid = mon.getMiddleware();
+      mid(req, res, next)
+        .then(() => {
+          assert(res.sendStatus.calledWith(200));
+        })
+        .then(() => {
+          process.once('SIGTERM', () => {
+            mid(req, res, next)
+              .then(() => {
+                assert(res.sendStatus.calledWith(500));
+                done();
+              });
+          });
+        });
+      process.kill(process.pid, 'SIGTERM');
     });
   });
 
