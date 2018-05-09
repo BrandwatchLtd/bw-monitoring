@@ -39,6 +39,10 @@ With this check added the endpoint will return 200 with a body showing the resul
 postgres 0
 ```
 
+## /livez
+
+The `/livez` endpoint is the same as `/checkz`, and checks are added the same way (via `bwMonitoring.addCheck()`.  However if any check fails it will return a `500` status code.  The content of the body will also be only the failed check
+
 ## /healthz
 
 By default `/healthz` returns a `200` status code. This can be used as a sensible default in a Kubernetes readinessProbe, and all it does is check that the express server is serving correctly. It checks no upstream dependencies for health, although it can be configured to do this using `addReadinessCheck`.
