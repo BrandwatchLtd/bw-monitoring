@@ -71,6 +71,33 @@ const getMiddleware = () => (req, res, next) => {
       );
   }
 
+  // Run the checks and error if the app is not healthy
+  else if (req.path === '/livez') {
+    res.set('Content-Type', prometheusContentType);
+
+    if (healthChecks.length < 1) {
+      return Promise.resolve().then(() => res.sendStatus(200));
+    }
+
+    const promisedChecks = healthChecks.map((check) =>
+      new Promise((resolve, reject) => doCheck(check)
+        .then(resolve)
+        .catch(reject)
+      )
+    );
+
+    return Promise.all(promisedChecks)
+      .then((statuses) => {
+        const badStatuses = statuses.filter(({ value }) => value !== 0);
+        if (badStatuses.length === 0) {
+          res.sendStatus(200);
+        } else {
+          res.sendStatus(500);
+        }
+        res.send(statuses.reduce(toPrometheusFormat, ''));
+      });
+  }
+
   // Send any prometheus metrics specified
   else if (req.path === '/metricz') {
     res.set('Content-Type', prometheusContentType);
