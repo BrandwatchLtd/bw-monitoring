@@ -1,6 +1,6 @@
 {
   "name": "bw-monitoring",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Add metric/checks endpoints to expressjs apps",
   "main": "src/index.js",
   "author": "Andy Hume andyhu@brandwatch.com",
