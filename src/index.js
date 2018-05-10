@@ -90,9 +90,9 @@ const getMiddleware = () => (req, res, next) => {
       .then((statuses) => {
         const badStatuses = statuses.filter(({ value }) => value !== 0);
         if (badStatuses.length === 0) {
-          res.sendStatus(200);
+          res.status(200);
         } else {
-          res.sendStatus(500);
+          res.status(500);
         }
         res.send(statuses.reduce(toPrometheusFormat, ''));
       });

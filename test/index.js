@@ -13,6 +13,7 @@ describe('bw-monitoring', () => {
     res = {
       set: sinon.spy(),
       sendStatus: sinon.spy(),
+      status: sinon.spy(),
       send: sinon.spy(),
     };
     next = sinon.spy();
@@ -127,7 +128,7 @@ describe('bw-monitoring', () => {
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
-          assert(res.sendStatus.calledWith(200));
+          assert(res.status.calledWith(200));
           assert(res.send.calledWith('bob0 0\nbob1 0\n'));
           done();
         });
@@ -141,7 +142,7 @@ describe('bw-monitoring', () => {
       const mid = mon.getMiddleware();
       mid(req, res, next)
         .then(() => {
-          assert(res.sendStatus.calledWith(500));
+          assert(res.status.calledWith(500));
           assert(res.send.calledWith('bob0 0\nbob1 1\nbob2 2\nbob3 3\n'));
           done();
         });
