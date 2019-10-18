@@ -1,12 +1,10 @@
 {
     "env": {
-        "es6": true,
-        "mocha": true
+        "node": true,
+        "es6": true
     },
-    "extends": "airbnb-base",
-    "rules": {
-        "arrow-parens": ["error", "always"],
-        "brace-style": 0,
-        "comma-dangle": 0
-    }
+    "parserOptions": {
+        "ecmaVersion": 2018,
+    },
+    "extends": "@vizia/eslint-config/ES2015"
 }

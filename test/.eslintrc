@@ -1,0 +1,18 @@
+{
+    "env": {
+        "node": true,
+        "mocha": true,
+        "es6": true
+    },
+    "globals": {
+        "expect": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018,
+    },
+    "extends": "@vizia/eslint-config/ES2015",
+    "rules": {
+        "max-lines": "off",
+        "max-statements": "off"
+    }
+}
