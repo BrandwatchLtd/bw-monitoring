@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Configure a ExpressJS middleware to expose useful health/metrics/checks endpoints.
  */
@@ -40,7 +42,7 @@ const addMetrics = (m) => {
 };
 
 const getMiddleware = () => (req, res, next) => {
-    if (req.path === '/healthz') {
+    const healthz = (res) => {
         res.set('Content-Type', prometheusContentType);
 
         if (readinessChecks.length < 1) {
@@ -56,10 +58,9 @@ const getMiddleware = () => (req, res, next) => {
         return Promise.all(promisedChecks)
             .then(() => res.sendStatus(200))
             .catch(() => res.sendStatus(500));
-    }
+    };
 
-    // Run the checks and return in prometheus formats
-    if (req.path === '/checkz') {
+    const checkz = res => {
         res.set('Content-Type', prometheusContentType);
 
         if (healthChecks.length < 1) {
@@ -76,10 +77,9 @@ const getMiddleware = () => (req, res, next) => {
             .then((check) => res.send(
                 check.reduce(toPrometheusFormat, '')
             ));
-    }
+    };
 
-    // Run the checks and error if the app is not healthy
-    if (req.path === '/livez') {
+    const livez = res => {
         res.set('Content-Type', prometheusContentType);
 
         if (healthChecks.length < 1) {
@@ -102,10 +102,9 @@ const getMiddleware = () => (req, res, next) => {
                 }
                 res.send(statuses.reduce(toPrometheusFormat, ''));
             });
-    }
+    };
 
-    // Send any prometheus metrics specified
-    if (req.path === '/metricz') {
+    const metricz = res => {
         res.set('Content-Type', prometheusContentType);
 
         if (!metrics) {
@@ -113,9 +112,24 @@ const getMiddleware = () => (req, res, next) => {
         }
 
         return Promise.resolve().then(() => res.send(metrics()));
-    }
+    };
 
-    return next();
+    switch (req.path) {
+        case '/healthz':
+            return healthz(res);
+
+        case '/checkz':
+            return checkz(res);
+
+        case '/livez':
+            return livez(res);
+
+        case '/metricz':
+            return metricz(res);
+
+        default:
+            return next();
+    }
 };
 
 const reset = () => {
