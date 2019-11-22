@@ -14,5 +14,8 @@
     "eslint-plugin-import": "^2.16.0",
     "mocha": "^5.2.0",
     "sinon": "^6.3.5"
+  },
+  "dependencies": {
+    "ip": "^1.1.5"
   }
 }

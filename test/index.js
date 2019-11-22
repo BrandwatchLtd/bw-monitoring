@@ -9,7 +9,11 @@ describe('bw-monitoring', () => {
   let next;
 
   beforeEach(() => {
-    req = {};
+    req = {
+      connection: {
+        remoteAddress: '127.0.0.1'
+      }
+    };
     res = {
       set: sinon.spy(),
       sendStatus: sinon.spy(),
@@ -28,6 +32,19 @@ describe('bw-monitoring', () => {
     const mid = mon.getMiddleware();
     mid(req, res, next);
     assert(next.called);
+  });
+
+  describe('IP filtering', () => {
+    beforeEach(() => {
+      req.path = '/healthz';
+    });
+
+    it('Filters out non-private IPs', () => {
+      const mid = mon.getMiddleware();
+      req.connection.remoteAddress = '4.4.4.4';
+      mid(req, res, next);
+      assert(next.called);
+    });
   });
 
   describe('/healthz endpoint', () => {
