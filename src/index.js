@@ -1,6 +1,7 @@
 /**
  * Configure a ExpressJS middleware to expose useful health/metrics/checks endpoints.
  */
+const ip = require('ip');
 
 // Default empty configuration
 let metrics;
@@ -30,6 +31,12 @@ const addReadinessCheck = (check) => readinessChecks.push(check);
 const addMetrics = (m) => { metrics = m; };
 
 const getMiddleware = () => (req, res, next) => {
+  const requestingIP = req.ip || req.connection.remoteAddress
+                       || req.socket.remoteAddress || req.connection.socket.remoteAddress;
+  if (!ip.isPrivate(requestingIP)) {
+    return next();
+  }
+
   if (req.path === '/healthz') {
     res.set('Content-Type', prometheusContentType);
 
