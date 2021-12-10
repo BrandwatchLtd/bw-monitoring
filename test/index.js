@@ -189,6 +189,15 @@ describe('bw-monitoring', () => {
           done();
         });
     });
+
+    it('should resolve a promise containing metrics', (done) => {
+      mon.addMetrics(async () => 'a string that was promised');
+      const mid = mon.getMiddleware();
+      mid(req, res, next).then(() => {
+        assert(res.send.calledWith('a string that was promised'));
+        done();
+      });
+    });
   });
 
   describe('Content-Type header', () => {
