@@ -109,7 +109,7 @@ const getMiddleware = () => (req, res, next) => {
       return Promise.resolve().then(() => res.sendStatus(404));
     }
 
-    return Promise.resolve().then(() => res.send(metrics()));
+    return Promise.resolve(metrics()).then((actualMetrics) => res.send(actualMetrics));
   }
 
   return next();
