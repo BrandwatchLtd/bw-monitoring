@@ -1,0 +1,33 @@
+name: Test
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  setup:
+    name: Set-up environment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: nvm
+        run: echo ::set-output name=node-version::$(cat .nvmrc)
+        shell: bash
+        working-directory: '${{ inputs.working-directory }}'
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "${{ steps.nvm.outputs.node-version }}"
+      - id: install
+        run: npm ci | tee ci-output.log
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - id: run-test
+        shell: bash
+        working-directory: '${{ inputs.working-directory }}'
+        run: npm test
+
