@@ -1,0 +1,24 @@
+name: Test
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: nvm
+        run: echo ::set-output name=node-version::$(cat .nvmrc)
+        shell: bash
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "${{ steps.nvm.outputs.node-version }}"
+      - id: install
+        run: npm ci | tee ci-output.log
+        shell: bash
+      - id: run-test
+        shell: bash
+        run: npm test
