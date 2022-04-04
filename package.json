@@ -1,5 +1,5 @@
 {
-  "name": "bw-monitoring",
+  "name": "@brandwatch/monitoring",
   "version": "1.4.0",
   "description": "Add metric/checks endpoints to expressjs apps",
   "main": "src/index.js",
