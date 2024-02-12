@@ -6,6 +6,7 @@
   "author": "Andy Hume andyhu@brandwatch.com",
   "license": "ISC",
   "scripts": {
+    "prepublishOnly": "npm run test",
     "test": "eslint . && mocha test/"
   },
   "devDependencies": {
@@ -14,6 +15,9 @@
     "eslint-plugin-import": "^2.16.0",
     "mocha": "^10.3.0",
     "sinon": "^6.3.5"
+  },
+  "publishConfig": {
+    "registry": "https://artifactory.brandwatch.com/artifactory/api/npm/npm"
   },
   "dependencies": {
     "ip": "^1.1.5"
