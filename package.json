@@ -20,6 +20,6 @@
     "registry": "https://artifactory.brandwatch.com/artifactory/api/npm/npm"
   },
   "dependencies": {
-    "ip": "^1.1.5"
+    "ip": "^2.0.1"
   }
 }
