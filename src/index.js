@@ -1,7 +1,7 @@
 /**
  * Configure a ExpressJS middleware to expose useful health/metrics/checks endpoints.
  */
-const ip = require('ip');
+const ipaddr = require('ipaddr.js');
 
 // Default empty configuration
 let metrics;
@@ -33,7 +33,8 @@ const addMetrics = (m) => { metrics = m; };
 const getMiddleware = () => (req, res, next) => {
   const requestingIP = req.ip || req.connection.remoteAddress
                        || req.socket.remoteAddress || req.connection.socket.remoteAddress;
-  if (!ip.isPrivate(requestingIP)) {
+
+  if (!['private', 'loopback'].includes(ipaddr.parse(requestingIP).range())) {
     return next();
   }
 
