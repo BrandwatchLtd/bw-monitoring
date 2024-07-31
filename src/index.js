@@ -1,7 +1,7 @@
 /**
  * Configure a ExpressJS middleware to expose useful health/metrics/checks endpoints.
  */
-const ip = require('ip');
+const net = require('net');
 
 // Default empty configuration
 let metrics;
@@ -9,6 +9,11 @@ let readinessChecks = [];
 let healthChecks = [];
 
 const prometheusContentType = 'text/plain; version=0.0.4';
+
+// Expect only requests in this range to get access to
+// the health/metrics/checks endpoints
+const blocklist = new net.BlockList();
+blocklist.addSubnet('10.0.0.0', 8);
 
 const doCheck = ({ name, check }) => new Promise((resolve) => {
   // Pass in the [ok, warning, critical, unknown] callbacks. i.e. just resolve the promise.
@@ -33,7 +38,9 @@ const addMetrics = (m) => { metrics = m; };
 const getMiddleware = () => (req, res, next) => {
   const requestingIP = req.ip || req.connection.remoteAddress
                        || req.socket.remoteAddress || req.connection.socket.remoteAddress;
-  if (!ip.isPrivate(requestingIP)) {
+
+  // Only expect private IPs from this range
+  if (!blocklist.check(requestingIP)) {
     return next();
   }
 
