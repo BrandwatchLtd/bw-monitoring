@@ -19,7 +19,7 @@
   "publishConfig": {
     "registry": "https://artifactory.brandwatch.com/artifactory/api/npm/npm"
   },
-  "dependencies": {
-    "ip": "^2.0.1"
+  "engines": {
+    "node": ">=14.18.0"
   }
 }

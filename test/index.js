@@ -11,7 +11,7 @@ describe('bw-monitoring', () => {
   beforeEach(() => {
     req = {
       connection: {
-        remoteAddress: '127.0.0.1'
+        remoteAddress: '10.0.0.1'
       }
     };
     res = {

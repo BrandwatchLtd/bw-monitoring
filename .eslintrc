@@ -1,7 +1,8 @@
 {
     "env": {
         "es6": true,
-        "mocha": true
+        "mocha": true,
+        "node": true
     },
     "extends": "airbnb-base",
     "rules": {
