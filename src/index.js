@@ -41,6 +41,9 @@ const getMiddleware = () => (req, res, next) => {
 
   // Only expect private IPs from this range
   if (!blocklist.check(requestingIP)) {
+    // eslint-disable-next-line no-console
+    console.debug(`Blocking request from ${requestingIP}`);
+
     return next();
   }
 
