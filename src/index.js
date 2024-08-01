@@ -40,7 +40,9 @@ const getMiddleware = () => (req, res, next) => {
                        || req.socket.remoteAddress || req.connection.socket.remoteAddress;
 
   // Only expect private IPs from this range
-  if (!blocklist.check(requestingIP)) {
+  const ipVersion = net.isIPv6(requestingIP) ? 'ipv6' : 'ipv4';
+
+  if (!blocklist.check(requestingIP, ipVersion)) {
     // eslint-disable-next-line no-console
     console.debug(`Blocking request from ${requestingIP}`);
 
