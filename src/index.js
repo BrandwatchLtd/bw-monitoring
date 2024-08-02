@@ -35,7 +35,7 @@ const addCheck = (check) => healthChecks.push(check);
 const addReadinessCheck = (check) => readinessChecks.push(check);
 const addMetrics = (m) => { metrics = m; };
 
-const getMiddleware = () => (req, res, next) => {
+const getMiddleware = ({ debug = false } = {}) => (req, res, next) => {
   const requestingIP = req.ip || req.connection.remoteAddress
                        || req.socket.remoteAddress || req.connection.socket.remoteAddress;
 
@@ -43,8 +43,10 @@ const getMiddleware = () => (req, res, next) => {
   const ipVersion = net.isIPv6(requestingIP) ? 'ipv6' : 'ipv4';
 
   if (!blocklist.check(requestingIP, ipVersion)) {
-    // eslint-disable-next-line no-console
-    console.debug(`Blocking request from ${requestingIP}`);
+    if (debug) {
+      // eslint-disable-next-line no-console
+      console.debug(`Blocking request from ${requestingIP}`);
+    }
 
     return next();
   }
