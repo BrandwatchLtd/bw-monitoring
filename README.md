@@ -1,16 +1,19 @@
 # bw-monitoring
 
-#  [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+## Version 3 now available with zero runtime dependencies, requires Node >=14.18.0.
 
+`@brandwatch/monitoring` is Express middleware that exposes a collection of standardised endpoints for monitoring infrastructure (e.g. Prometheus) to consume.
 
-`bw-monitoring` is Express middleware that exposes a collection of standardised endpoints for monitoring infrastructure (e.g. Prometheus) to consume.
+`npm i @brandwatch/monitoring`
 
-`npm install --save bw-monitoring`
+The package is published to brandwatch private artifactory repo, and therefore npmrc will need to be setup.
+`npm login --registry https://artifactory.brandwatch.com/artifactory/api/npm/npm/` Can be run to setup a local npmrc, however, for the service to install & use this package
+the npmrc must be mounted. For example see https://github.com/BrandwatchLtd/application-service/blob/main/service/Dockerfile#L19
 
-`bw-monitoring` exports a function `getMiddleware` which returns an express middleware to pass to `expressApp.use`. This adds standard routes `/healthz`, `/metricz`, `/checkz`.
+`@brandwatch/monitoring` exports a function `getMiddleware` which returns an express middleware to pass to `expressApp.use`. This adds standard routes `/healthz`, `/metricz`, `/checkz`.
 
 ```js
-var monitoring = require('bw-monitoring');
+var monitoring = require('@brandwatch/monitoring');
 expressApp.use(monitoring.getMiddleware());
 ```
 
@@ -73,10 +76,3 @@ var c = new Counter('my_counter');
 setTimeout(c.inc, 200);
 monitoring.addMetrics(() => prometheus.register.metrics());
 ```
-
-[npm-image]: https://badge.fury.io/js/bw-monitoring.svg
-[npm-url]: https://npmjs.org/package/bw-monitoring
-[travis-image]: https://travis-ci.org/BrandwatchLtd/bw-monitoring.svg?branch=master
-[travis-url]: https://travis-ci.org/BrandwatchLtd/bw-monitoring
-[daviddm-image]: https://david-dm.org/BrandwatchLtd/bw-monitoring.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/BrandwatchLtd/bw-monitoring
