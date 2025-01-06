@@ -2,6 +2,8 @@
 
 ## Version 3 now available with zero runtime dependencies, requires Node >=14.18.0.
 
+# Usage
+
 `@brandwatch/monitoring` is Express middleware that exposes a collection of standardised endpoints for monitoring infrastructure (e.g. Prometheus) to consume.
 
 `npm i @brandwatch/monitoring`
@@ -76,3 +78,21 @@ var c = new Counter('my_counter');
 setTimeout(c.inc, 200);
 monitoring.addMetrics(() => prometheus.register.metrics());
 ```
+
+# Deployment
+
+This package is deployed to artifactory. It has no build step or dependencies.
+To publish a new verison of this package:
+
+1. Merge changes from PR into master/main branch.
+2. Checkout master branch
+3. Version the package accordingly with [semver](https://semver.org/) `npm version major|minor|patch`
+4. Publish version to artifactory `npm run publish` (the `prepublishOnly` hook will ensure tests pass first)
+5. Commit the version change & push the tags to remote
+  ```
+    git add .
+    git commit -m 'chore: publish vX.X.X'
+    git push && git push --tags
+  ```
+
+Assuming all steps were successfull a new version of the package will be available for usage in consuming apps.
